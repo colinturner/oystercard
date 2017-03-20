@@ -12,4 +12,8 @@ describe Oystercard do
     expect(oystercard.balance).to eq(0)
   end
 
+  it 'can top up with given amount of money' do
+    expect(oystercard).to respond_to(:top_up).with(1).argument
+  end
+
 end
