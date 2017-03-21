@@ -1,7 +1,7 @@
 # holding a card balance, tracking journies,
 class Oystercard
 
-  attr_reader :balance, :in_journey
+  attr_reader :balance, :in_journey, :entry_station
 
   MAX_BALANCE     = 90
   MINIMUM_BALANCE = 1
@@ -9,31 +9,31 @@ class Oystercard
 
   def initialize
     @balance = 0
-    @in_journey = false
+    @entry_station = nil
   end
 
   def top_up(amount)
-    fail "Cannot top up card. Max deposit (#{MAX_BALANCE}) exceeded. Try Lower Amount" if invalid_top_up?(amount)
+    raise "Cannot top up card. Max deposit (#{MAX_BALANCE}) exceeded. Try Lower Amount" if invalid_top_up?(amount)
     self.balance += 10
   end
 
 
-  def touch_in
+  def touch_in(entry_station)
     raise "Cannot start journey. Minimum balance required is £#{MINIMUM_BALANCE}" if low_balance?
-    self.in_journey = true
+    self.entry_station = entry_station
   end
 
   def touch_out
     deduct(MINIMUM_FARE)
-    self.in_journey = false
+    self.entry_station = nil
   end
 
   def in_journey?
-    in_journey
+    !!entry_station  # same as !entry_station.nil?
   end
 
   private
-  attr_writer :balance, :in_journey
+  attr_writer :balance, :in_journey, :entry_station
 
   def low_balance?
     balance < 1

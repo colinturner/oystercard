@@ -1,5 +1,6 @@
 
 describe "User Stories" do
+  let (:station) {double(:station)}
 
   # In order to use public transport
   # As a customer
@@ -37,7 +38,7 @@ describe "User Stories" do
   it "so customer can spend balance, deduct money from card" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in
+    card.touch_in(:station)
     card.touch_out
     expect(card.balance).to eq 8
   end
@@ -55,14 +56,14 @@ describe "User Stories" do
   it "so that the card can track the beginning of a journey" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in
+    card.touch_in(:station)
     expect(card.in_journey?).to eq true
   end
 
   it "so that the card can track the end of the journey" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in
+    card.touch_in(:station)
     card.touch_out
     expect(card.in_journey?).to eq false
   end
@@ -70,7 +71,7 @@ describe "User Stories" do
   it "so that the card ensures user has minimum balance for journey" do
     card = Oystercard.new
     min_balance = Oystercard::MINIMUM_BALANCE
-    expect{card.touch_in}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
+    expect{card.touch_in(:station)}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
   end
 
   #  In order to pay for my journey
@@ -80,8 +81,48 @@ describe "User Stories" do
     card = Oystercard.new
     card.top_up(10)
     min_fare = Oystercard::MINIMUM_FARE
-    card.touch_in
+    card.touch_in(:station)
     expect { card.touch_out }.to change { card.balance }.by -min_fare
   end
-  
+
+  # In order to pay for my journey
+  # As a customer
+  # I need to know where I've travelled from
+
+  it "should store the station where journey begins" do
+    card = Oystercard.new
+    card.top_up(10)
+    card.touch_in(:station)
+    expect(card.entry_station).to eq :station
+  end
+
+
+  # As TLF
+  # I want the oystercard to remove its stored station on touch out
+  # so that its ready for the next journey
+
+  it "should remove its stored station" do
+    card = Oystercard.new
+    card.top_up(10)
+    card.touch_in(:station)
+    card.touch_out
+    expect(card.entry_station).to eq nil
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 end

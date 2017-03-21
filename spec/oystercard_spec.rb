@@ -3,6 +3,7 @@ require "oystercard"
 describe Oystercard do
 
   subject(:oystercard) {described_class.new}
+  let (:station) {double(:station)}
 
   describe '#initialization' do
     it 'should initialize card as not in a journey' do
@@ -37,12 +38,20 @@ describe Oystercard do
   context 'when card has enough balance for the complete journey' do
     before do
       oystercard.top_up(10)
-      oystercard.touch_in
+      oystercard.touch_in(:station)
     end
 
     describe "#touch_in" do
       it "should respond to touch_in" do
         expect(oystercard).to be_in_journey
+      end
+
+      it "should take station as an argument" do
+        expect{oystercard.touch_in(:station)}.not_to raise_error
+      end
+
+      it "returns the station where journey begins" do
+        expect(oystercard.entry_station).to eq :station
       end
     end
 
@@ -56,6 +65,11 @@ describe Oystercard do
         min_fare = Oystercard::MINIMUM_FARE
         expect{ oystercard.touch_out }.to change {oystercard.balance}.by -min_fare
       end
+
+      it "sets the entry station to nil on touch_out" do
+        oystercard.touch_out
+        expect(oystercard.entry_station).to eq nil
+      end
     end
   end
 
@@ -63,9 +77,28 @@ describe Oystercard do
     describe  "#touch_in" do
       it "restricts start of journey if minimum balance not met" do
         min_balance = Oystercard::MINIMUM_BALANCE
-        expect{oystercard.touch_in}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
+        expect{oystercard.touch_in(:station)}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
       end
     end
   end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 end
