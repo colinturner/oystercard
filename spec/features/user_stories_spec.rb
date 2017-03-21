@@ -52,15 +52,23 @@ describe "User Stories" do
 
   it "so that the card can track the beginning of a journey" do
     card = Oystercard.new
+    card.top_up(10)
     card.touch_in
     expect(card.in_journey?).to eq true
   end
 
   it "so that the card can track the end of the journey" do
     card = Oystercard.new
+    card.top_up(10)
     card.touch_in
     card.touch_out
     expect(card.in_journey?).to eq false
+  end
+
+  it "so that the card ensures user has minimum balance for journey" do
+    card = Oystercard.new
+    min_balance = Oystercard::MINIMUM_BALANCE
+    expect{card.touch_in}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
   end
 
 end

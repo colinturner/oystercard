@@ -18,20 +18,15 @@ describe Oystercard do
     it 'can top up with given amount of money' do
       expect(oystercard).to respond_to(:top_up).with(1).argument
     end
-  end
 
-  describe "#invalid_top_up?" do
-
-    it "has the method" do
-      expect(oystercard).to respond_to(:invalid_top_up?).with(1).argument
-    end
-
-
-    it "if top up will exceed 90 it will return true" do
-      expect(oystercard.invalid_top_up?(95)).to eq(true)
+    it "cannot top up if new balance exceeds 90" do
+      max_balance = Oystercard::MAX_BALANCE
+      message = "Cannot top up card. Max deposit (#{max_balance}) exceeded. Try Lower Amount"
+      expect{ oystercard.top_up(95) }.to raise_error message
     end
 
   end
+
 
   describe "#deduct" do
 
@@ -49,6 +44,7 @@ describe Oystercard do
 
   context 'when card has enough balance for the complete journey' do
     before do
+      oystercard.top_up(10)
       oystercard.touch_in
     end
 
@@ -66,5 +62,13 @@ describe Oystercard do
     end
   end
 
+  context 'when card hase a balance of 0' do
+    describe  "#touch_in" do
+      it "restricts start of journey if minimum balance not met" do
+        min_balance = Oystercard::MINIMUM_BALANCE
+        expect{oystercard.touch_in}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
+      end
+    end
+  end
 
 end

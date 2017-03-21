@@ -2,7 +2,8 @@ class Oystercard
 
   attr_reader :balance, :in_journey
 
-  MAX_BALANCE = 90
+  MAX_BALANCE     = 90
+  MINIMUM_BALANCE = 1
 
   def initialize
     @balance = 0
@@ -14,15 +15,12 @@ class Oystercard
     self.balance += 10
   end
 
-  def invalid_top_up?(amount)
-    MAX_BALANCE <= amount + balance
-  end
-
   def deduct(amount)
     self.balance -= amount
   end
 
   def touch_in
+    raise "Cannot start journey. Minimum balance required is £#{MINIMUM_BALANCE}" if low_balance?
     self.in_journey = true
   end
 
@@ -36,5 +34,13 @@ class Oystercard
 
   private
   attr_writer :balance, :in_journey
+
+  def low_balance?
+    balance < 1
+  end
+
+  def invalid_top_up?(amount)
+    MAX_BALANCE <= amount + balance
+  end
 
 end
