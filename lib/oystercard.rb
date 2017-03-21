@@ -17,6 +17,10 @@ class Oystercard
     MAX_BALANCE <= amount + balance
   end
 
+  def deduct(amount)
+    self.balance -= amount
+  end
+
   private
   attr_writer :balance
 

@@ -6,10 +6,6 @@ describe Oystercard do
 
   describe "#balance" do
 
-    it "responds to #balance" do
-      expect(oystercard).to respond_to(:balance)
-    end
-
     it "new card has zero balance" do
       expect(oystercard.balance).to eq(0)
     end
@@ -20,7 +16,6 @@ describe Oystercard do
     it 'can top up with given amount of money' do
       expect(oystercard).to respond_to(:top_up).with(1).argument
     end
-
   end
 
   describe "#invalid_top_up?" do
@@ -31,11 +26,17 @@ describe Oystercard do
 
 
     it "if top up will exceed 90 it will return true" do
-
       expect(oystercard.invalid_top_up?(95)).to eq(true)
-
     end
 
+  end
+
+  describe "#deduct" do
+
+    it "should deduct amount specifed from balance" do
+      oystercard.top_up(10)
+      expect{oystercard.deduct(5)}.to change{oystercard.balance}.by -5
+    end
   end
 
 end

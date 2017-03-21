@@ -30,5 +30,15 @@ describe "User Stories" do
 
   end
 
+# In order to pay for my journey
+# As a customer
+# I need my fare deducted from my card
+
+  it "so customer can spend balance, deduct money from card" do
+    card = Oystercard.new
+    card.top_up(10)
+    expect(card.deduct(5)).to eq 5
+  end
+
 
 end
