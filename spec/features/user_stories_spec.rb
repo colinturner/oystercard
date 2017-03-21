@@ -30,9 +30,9 @@ describe "User Stories" do
 
   end
 
-# In order to pay for my journey
-# As a customer
-# I need my fare deducted from my card
+  # In order to pay for my journey
+  # As a customer
+  # I need my fare deducted from my card
 
   it "so customer can spend balance, deduct money from card" do
     card = Oystercard.new
@@ -40,5 +40,27 @@ describe "User Stories" do
     expect(card.deduct(5)).to eq 5
   end
 
+
+  # In order to get through the barriers.
+  # As a customer
+  # I need to touch in and out.
+
+  it "let the card be aware whether it's being used on a journey or not" do
+    card = Oystercard.new
+    expect(card.in_journey?).to eq false
+  end
+
+  it "so that the card can track the beginning of a journey" do
+    card = Oystercard.new
+    card.touch_in
+    expect(card.in_journey?).to eq true
+  end
+
+  it "so that the card can track the end of the journey" do
+    card = Oystercard.new
+    card.touch_in
+    card.touch_out
+    expect(card.in_journey?).to eq false
+  end
 
 end
