@@ -37,7 +37,9 @@ describe "User Stories" do
   it "so customer can spend balance, deduct money from card" do
     card = Oystercard.new
     card.top_up(10)
-    expect(card.deduct(5)).to eq 5
+    card.touch_in
+    card.touch_out
+    expect(card.balance).to eq 8
   end
 
 
@@ -71,4 +73,15 @@ describe "User Stories" do
     expect{card.touch_in}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
   end
 
+  #  In order to pay for my journey
+  # As a customer
+  # When my journey is complete, I need the correct amount deducted from my card
+  it "should reduce the balance by the minimum amount when touching out" do
+    card = Oystercard.new
+    card.top_up(10)
+    min_fare = Oystercard::MINIMUM_FARE
+    card.touch_in
+    expect { card.touch_out }.to change { card.balance }.by -min_fare
+  end
+  
 end

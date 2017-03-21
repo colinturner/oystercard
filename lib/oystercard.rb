@@ -1,9 +1,11 @@
+# holding a card balance, tracking journies,
 class Oystercard
 
   attr_reader :balance, :in_journey
 
   MAX_BALANCE     = 90
   MINIMUM_BALANCE = 1
+  MINIMUM_FARE = 2
 
   def initialize
     @balance = 0
@@ -15,9 +17,6 @@ class Oystercard
     self.balance += 10
   end
 
-  def deduct(amount)
-    self.balance -= amount
-  end
 
   def touch_in
     raise "Cannot start journey. Minimum balance required is £#{MINIMUM_BALANCE}" if low_balance?
@@ -25,6 +24,7 @@ class Oystercard
   end
 
   def touch_out
+    deduct(MINIMUM_FARE)
     self.in_journey = false
   end
 
@@ -41,6 +41,10 @@ class Oystercard
 
   def invalid_top_up?(amount)
     MAX_BALANCE <= amount + balance
+  end
+
+  def deduct(amount)
+    self.balance -= amount
   end
 
 end
