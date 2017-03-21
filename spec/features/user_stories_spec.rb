@@ -1,6 +1,7 @@
 
 describe "User Stories" do
-  let (:station) {double(:station)}
+  let (:entry_station) {double(:entry_station)}
+  let (:exit_station) {double(:exit_station)}
 
   # In order to use public transport
   # As a customer
@@ -38,8 +39,8 @@ describe "User Stories" do
   it "so customer can spend balance, deduct money from card" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in(:station)
-    card.touch_out
+    card.touch_in(:entry_station)
+    card.touch_out(:exit_station)
     expect(card.balance).to eq 8
   end
 
@@ -56,22 +57,22 @@ describe "User Stories" do
   it "so that the card can track the beginning of a journey" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in(:station)
+    card.touch_in(:entry_station)
     expect(card.in_journey?).to eq true
   end
 
   it "so that the card can track the end of the journey" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in(:station)
-    card.touch_out
+    card.touch_in(:entry_station)
+    card.touch_out(:exit_station)
     expect(card.in_journey?).to eq false
   end
 
   it "so that the card ensures user has minimum balance for journey" do
     card = Oystercard.new
     min_balance = Oystercard::MINIMUM_BALANCE
-    expect{card.touch_in(:station)}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
+    expect{card.touch_in(:entry_station)}.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
   end
 
   #  In order to pay for my journey
@@ -81,8 +82,8 @@ describe "User Stories" do
     card = Oystercard.new
     card.top_up(10)
     min_fare = Oystercard::MINIMUM_FARE
-    card.touch_in(:station)
-    expect { card.touch_out }.to change { card.balance }.by -min_fare
+    card.touch_in(:entry_station)
+    expect { card.touch_out(:exit_station) }.to change { card.balance }.by -min_fare
   end
 
   # In order to pay for my journey
@@ -92,8 +93,8 @@ describe "User Stories" do
   it "should store the station where journey begins" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in(:station)
-    expect(card.entry_station).to eq :station
+    card.touch_in(:entry_station)
+    expect(card.entry_station).to eq :entry_station
   end
 
 
@@ -104,16 +105,30 @@ describe "User Stories" do
   it "should remove its stored station" do
     card = Oystercard.new
     card.top_up(10)
-    card.touch_in(:station)
-    card.touch_out
+    card.touch_in(:entry_station)
+    card.touch_out(:exit_station)
     expect(card.entry_station).to eq nil
   end
 
+    # In order to know where I have been
+    # As a customer
+    # I want to see to all my previous trips
+    it "so journey can be correctly logged, card registers the exit station" do
+      card = Oystercard.new
+      card.top_up(50)
+      card.touch_in(:entry_station)
+      card.touch_out(:exit_station)
+      expect(card.exit_station).to eq :exit_station
+    end
 
 
-
-
-
+    it 'stores a history of trips' do
+      card = Oystercard.new
+      card.top_up(50)
+      card.touch_in(:entry_station)
+      card.touch_out(:exit_station)
+      expect(card.journeys).to include {entry_station::exit_station}
+    end
 
 
 
